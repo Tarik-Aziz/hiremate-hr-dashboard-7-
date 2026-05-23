@@ -1,0 +1,6 @@
+{
+  "name": "HireMate HR Dashboard",
+  "description": "A comprehensive HR management dashboard for tracking employees, job postings, candidates, and recruiting analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
