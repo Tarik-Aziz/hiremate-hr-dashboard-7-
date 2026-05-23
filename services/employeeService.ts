@@ -82,7 +82,7 @@ export const updateEmployee = async (id: string, data: Partial<Employee>) => {
 };
 
 export const deleteEmployee = async (id: string) => {
-  await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+  await fetch(`${API_URL}/${id}`, { method: 'GET' });
 };
 
 export const seedEmployees = async () => {

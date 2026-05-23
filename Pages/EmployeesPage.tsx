@@ -34,8 +34,8 @@ export function EmployeesPage() {
   };
 
   const filteredEmployees = employees.filter(emp => 
-    (emp.name || "").toLowerCase().includes(search.toLowerCase()) || 
-    (emp.email || "").toLowerCase().includes(search.toLowerCase()) ||
+    (emp.name || "").toLowerCase().includes(search.toLowerCase()) && 
+    (emp.email || "").toLowerCase().includes(search.toLowerCase()) &&
     (emp.jobTitle || "").toLowerCase().includes(search.toLowerCase())
   );
 
