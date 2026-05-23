@@ -1,0 +1,90 @@
+{
+  "entities": {
+    "Employee": {
+      "title": "Employee",
+      "description": "An employee or staff record in the system",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["HR Manager", "Recruiter", "Interviewer", "Viewer", "Super Admin"] },
+        "email": { "type": "string", "format": "email" },
+        "status": { "type": "string", "enum": ["Permanent", "Onboarding", "Active", "Inactive", "Resigned", "Declined"] },
+        "security": { "type": "string", "enum": ["Verified", "Pending", "Revoked"] },
+        "jobTitle": { "type": "string" },
+        "joinedAt": { "type": "string", "format": "date-time" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["name", "role", "email", "status"]
+    },
+    "Job": {
+      "title": "Job Posting",
+      "description": "A job posting created by HR",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "department": { "type": "string" },
+        "location": { "type": "string" },
+        "employmentType": { "type": "string" },
+        "salaryRange": { "type": "string" },
+        "description": { "type": "string" },
+        "views": { "type": "number" },
+        "applicants": { "type": "number" },
+        "status": { "type": "string", "enum": ["Active", "Draft", "Closed"] },
+        "postedAt": { "type": "string", "format": "date-time" },
+        "platforms": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "department", "status"]
+    },
+    "Candidate": {
+      "title": "Candidate",
+      "description": "A candidate applying for a job",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "jobId": { "type": "string" },
+        "jobTitle": { "type": "string" },
+        "status": { "type": "string", "enum": ["Applied", "Screened", "Interview", "Offer", "Hired", "Rejected"] },
+        "matchScore": { "type": "number" },
+        "matchVerdict": { "type": "string" },
+        "experience": { "type": "string" },
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "appliedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "jobId", "status"]
+    },
+    "Stats": {
+      "title": "Dashboard Stats",
+      "description": "Aggregate statistics for the dashboard",
+      "type": "object",
+      "properties": {
+        "totalEmployees": { "type": "number" },
+        "jobViews": { "type": "number" },
+        "jobApplied": { "type": "number" },
+        "resignedEmployees": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Collection of employee documents"
+    },
+    "/jobs/{jobId}": {
+      "schema": "Job",
+      "description": "Collection of job postings"
+    },
+    "/candidates/{candidateId}": {
+      "schema": "Candidate",
+      "description": "Collection of job candidates"
+    },
+    "/stats/dashboard": {
+      "schema": "Stats",
+      "description": "Global statistics for the dashboard"
+    }
+  }
+}

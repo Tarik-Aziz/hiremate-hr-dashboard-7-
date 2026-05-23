@@ -9,6 +9,7 @@ import { seedJobs } from "../services/jobService";
 import { seedCandidates } from "../services/candidateService";
 import { cn } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+import { getApiUrl } from "../services/api";
 
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -25,7 +26,7 @@ export function Dashboard() {
 
     const fetchAnalytics = async () => {
       try {
-        const response = await fetch("/api/analytics");
+        const response = await fetch(getApiUrl("/api/analytics"));
         if (!response.ok) {
           console.warn(`Analytics fetch failed with status: ${response.status}`);
           return;
