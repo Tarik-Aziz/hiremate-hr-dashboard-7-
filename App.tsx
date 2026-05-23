@@ -21,6 +21,8 @@ interface MockUser {
   email: string;
 }
 
+import { getApiUrl } from "./services/api";
+
 export default function App() {
   const [user, setUser] = useState<MockUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function App() {
     setLoading(false);
 
     // Verify database connection status
-    fetch("/api/debug")
+    fetch(getApiUrl("/api/debug"))
       .then(res => res.json())
       .then(data => {
         if (data && typeof data.isInMemoryMode === "boolean") {
