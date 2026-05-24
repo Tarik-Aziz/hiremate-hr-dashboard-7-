@@ -11,6 +11,12 @@ export function EmployeesPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState<(() => Promise<void>) | null>(null);
 
+  const reloadEmployees = async () => {
+    if (refreshTrigger) {
+      await refreshTrigger();
+    }
+  };
+
   useEffect(() => {
     const { unsubscribe, refresh } = subscribeToEmployees((data) => {
       setEmployees(data);
@@ -23,20 +29,21 @@ export function EmployeesPage() {
   const handleSeed = async () => {
     setLoading(true);
     await seedEmployees();
-    if (refreshTrigger) refreshTrigger();
+    await reloadEmployees();
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this employee?")) {
       await deleteEmployee(id);
-      if (refreshTrigger) refreshTrigger();
+      await reloadEmployees();
     }
   };
 
+  const searchTerm = search.toLowerCase();
   const filteredEmployees = employees.filter(emp => 
-    (emp.name || "").toLowerCase().includes(search.toLowerCase()) && 
-    (emp.email || "").toLowerCase().includes(search.toLowerCase()) &&
-    (emp.jobTitle || "").toLowerCase().includes(search.toLowerCase())
+    (emp.name || "").toLowerCase().includes(searchTerm) && 
+    (emp.email || "").toLowerCase().includes(searchTerm) &&
+    (emp.jobTitle || "").toLowerCase().includes(searchTerm)
   );
 
   return (
@@ -192,7 +199,7 @@ export function EmployeesPage() {
                   security: "Pending",
                   joinedAt: new Date().toISOString()
                 });
-                if (refreshTrigger) refreshTrigger();
+                await reloadEmployees();
                 setIsAddModalOpen(false);
               }} className="space-y-4">
                 <div>

@@ -2,6 +2,19 @@ import { getApiUrl } from './api';
 
 const API_URL = getApiUrl('/api/employees');
 
+const parseJsonResponse = async (response: Response) => {
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    return null;
+  }
+  const data = await response.json();
+  if (data && data.error) {
+    console.error("API Error:", data.error);
+    return null;
+  }
+  return data;
+};
+
 export interface Employee {
   id: string;
   name: string;
@@ -21,15 +34,7 @@ export const getEmployees = async (): Promise<Employee[]> => {
       console.warn(`getEmployees failed with status: ${response.status}`);
       return [];
     }
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      return [];
-    }
-    const data = await response.json();
-    if (data && data.error) {
-       console.error("API Error in getEmployees:", data.error);
-       return [];
-    }
+    const data = await parseJsonResponse(response);
     return Array.isArray(data) ? data.map((item: any) => ({ ...item, id: item._id || item.id })) : [];
   } catch (error) {
     console.error("Error fetching employees:", error);
@@ -61,12 +66,8 @@ export const addEmployee = async (employee: Omit<Employee, "id">) => {
       console.error(`addEmployee failed with status: ${response.status}`);
       return "";
     }
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      return "";
-    }
-    const result = await response.json();
-    return result._id || result.id || "";
+    const result = await parseJsonResponse(response);
+    return result ? result._id || result.id || "" : "";
   } catch (err) {
     console.error("addEmployee failed:", err);
     return "";
