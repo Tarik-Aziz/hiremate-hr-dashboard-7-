@@ -30,7 +30,7 @@ let lastConnectionAttempt = 0;
 // Mock database store when connection is missing or invalid
 class MockCollection {
   private data: any[] = [];
-  
+
   constructor(initialData: any[] = []) {
     this.data = initialData.map(item => {
       if (!item._id) {
@@ -285,10 +285,10 @@ const initialProfile = {
 
 class MockDb {
   collections: Record<string, MockCollection> = {};
-  
+
   constructor() {
     this.collections.employees = new MockCollection(initialEmployees);
-    
+
     const mockJobs = initialJobs.map(job => {
       const id = new ObjectId();
       return { ...job, _id: id };
@@ -432,7 +432,7 @@ class ResilientDb {
           if (mongoClient) {
             try {
               await mongoClient.close();
-            } catch (e) {}
+            } catch (e) { }
             mongoClient = null;
           }
           const mockCol = mockDbInstance.collection(name);
@@ -449,10 +449,10 @@ class ResilientDb {
           try {
             realCursor = realCollection.find(filter);
           } catch (err: any) {
-             console.warn(`⚠️ Error creating cursor: ${err.message}. Falling back.`);
-             isInMemoryMode = true;
-             lastDbError = err.message;
-             return mockDbInstance.collection(name).find(filter);
+            console.warn(`⚠️ Error creating cursor: ${err.message}. Falling back.`);
+            isInMemoryMode = true;
+            lastDbError = err.message;
+            return mockDbInstance.collection(name).find(filter);
           }
         }
 
@@ -492,7 +492,7 @@ class ResilientDb {
                 isInMemoryMode = true;
                 lastDbError = err.message;
                 if (mongoClient) {
-                  try { await mongoClient.close(); } catch (e) {}
+                  try { await mongoClient.close(); } catch (e) { }
                   mongoClient = null;
                 }
                 return await mockDbInstance.collection(name).find(filter).toArray();
@@ -541,14 +541,14 @@ async function getDb(forceReconnect = false) {
   const uri = getMongoUri();
   const now = Date.now();
   const RETRY_INTERVAL_MS = 15000; // 15 seconds
-  
+
   if (forceReconnect) {
     isInMemoryMode = false;
     lastDbError = null;
     if (mongoClient) {
       try {
         await mongoClient.close();
-      } catch (e) {}
+      } catch (e) { }
       mongoClient = null;
     }
   }
@@ -577,12 +577,12 @@ async function getDb(forceReconnect = false) {
         serverSelectionTimeoutMS: 5000,
       });
       await mongoClient.connect();
-      
+
       const db = mongoClient.db(dbName);
-      
+
       // Ping the database to force actual handshake and catch SSL / IP whitelist errors early!
       await db.command({ ping: 1 });
-      
+
       console.log("✅ Successfully connected and pinged MongoDB Database");
       isInMemoryMode = false;
       lastDbError = null;
@@ -596,7 +596,7 @@ async function getDb(forceReconnect = false) {
       if (mongoClient) {
         try {
           await mongoClient.close();
-        } catch (e) {}
+        } catch (e) { }
         mongoClient = null;
       }
       return mockDbInstance as any;
@@ -634,7 +634,7 @@ async function startServer() {
     if (force || isInMemoryMode) {
       try {
         await getDb(true);
-      } catch (err) {}
+      } catch (err) { }
     }
     res.json({
       nodeEnv: process.env.NODE_ENV,
@@ -651,7 +651,7 @@ async function startServer() {
       if (!checkConfig(res)) return;
       const db = await getDb();
       const employees = await db.collection("employees").find({}).toArray();
-      
+
       const data = employees.map(emp => ({
         ...emp,
         id: emp._id.toString()
@@ -698,7 +698,7 @@ async function startServer() {
       let queryId: any = id;
       try {
         queryId = new ObjectId(id);
-      } catch (e) {}
+      } catch (e) { }
 
       await db.collection("employees").updateOne(
         { _id: queryId },
@@ -719,7 +719,7 @@ async function startServer() {
       let queryId: any = id;
       try {
         queryId = new ObjectId(id);
-      } catch (e) {}
+      } catch (e) { }
 
       await db.collection("employees").deleteOne({ _id: queryId });
       res.json({ success: true });
@@ -738,7 +738,7 @@ async function startServer() {
         .find({})
         .sort({ postedAt: -1 })
         .toArray();
-      
+
       const data = jobs.map(job => ({
         ...job,
         id: job._id.toString()
@@ -787,7 +787,7 @@ async function startServer() {
       let queryId: any = id;
       try {
         queryId = new ObjectId(id);
-      } catch (e) {}
+      } catch (e) { }
 
       await db.collection("jobs").updateOne(
         { _id: queryId },
@@ -808,7 +808,7 @@ async function startServer() {
       let queryId: any = id;
       try {
         queryId = new ObjectId(id);
-      } catch (e) {}
+      } catch (e) { }
 
       await db.collection("jobs").deleteOne({ _id: queryId });
       res.json({ success: true });
@@ -823,7 +823,7 @@ async function startServer() {
     try {
       if (!checkConfig(res)) return;
       const db = await getDb();
-      
+
       const queryFilter: any = {};
       if (req.query.jobId) {
         queryFilter.jobId = req.query.jobId;
@@ -833,7 +833,7 @@ async function startServer() {
         .find(queryFilter)
         .sort({ appliedAt: -1 })
         .toArray();
-      
+
       const data = candidates.map(c => ({
         ...c,
         id: c._id.toString()
@@ -868,7 +868,7 @@ async function startServer() {
         let jobQueryId: any = candidateData.jobId;
         try {
           jobQueryId = new ObjectId(candidateData.jobId);
-        } catch (e) {}
+        } catch (e) { }
 
         // Increment applicants count
         await db.collection("jobs").updateOne(
@@ -895,7 +895,7 @@ async function startServer() {
       let queryId: any = id;
       try {
         queryId = new ObjectId(id);
-      } catch (e) {}
+      } catch (e) { }
 
       await db.collection("candidates").updateOne(
         { _id: queryId },
@@ -916,18 +916,18 @@ async function startServer() {
       let queryId: any = id;
       try {
         queryId = new ObjectId(id);
-      } catch (e) {}
+      } catch (e) { }
 
       // Find candidate to get the jobId
       const candidate = await db.collection("candidates").findOne({ _id: queryId });
-      
+
       await db.collection("candidates").deleteOne({ _id: queryId });
-      
+
       if (candidate && candidate.jobId) {
         let jobQueryId: any = candidate.jobId;
         try {
           jobQueryId = new ObjectId(candidate.jobId);
-        } catch (e) {}
+        } catch (e) { }
 
         // Decrement applicants count
         await db.collection("jobs").updateOne(
@@ -952,7 +952,7 @@ async function startServer() {
     try {
       if (!checkConfig(res)) return;
       const db = await getDb();
-      
+
       const [
         totalEmployees,
         totalJobs,
@@ -966,7 +966,7 @@ async function startServer() {
       const nEmployees = totalEmployees || 0;
       const nJobs = totalJobs || 0;
       const nCandidates = totalCandidates || 0;
-      
+
       // Calculate dynamic growth values
       const employeesGrowth = nEmployees > 0 ? Math.min(25, 5 + nEmployees * 2) : 0;
       const jobAppliedGrowth = nCandidates > 0 ? Math.min(30, 8 + nCandidates * 3) : 0;
@@ -1020,7 +1020,7 @@ async function startServer() {
 
       lastSixMonths[5].hires = nHires;
       lastSixMonths[5].applications = nApps;
-      
+
       for (let i = 4; i >= 0; i--) {
         lastSixMonths[i].hires = Math.max(0, Math.floor(nHires * (0.5 + i * 0.1)));
         lastSixMonths[i].applications = Math.max(0, Math.floor(nApps * (0.8 + i * 0.05)));
@@ -1076,7 +1076,7 @@ async function startServer() {
       delete updateData.id;
       const id = req.params.id;
       let queryId: any = id;
-      try { queryId = new ObjectId(id); } catch (e) {}
+      try { queryId = new ObjectId(id); } catch (e) { }
       await db.collection("calendarEvents").updateOne({ _id: queryId }, { $set: updateData });
       res.json({ success: true });
     } catch (err: any) {
@@ -1090,7 +1090,7 @@ async function startServer() {
       const db = await getDb();
       const id = req.params.id;
       let queryId: any = id;
-      try { queryId = new ObjectId(id); } catch (e) {}
+      try { queryId = new ObjectId(id); } catch (e) { }
       await db.collection("calendarEvents").deleteOne({ _id: queryId });
       res.json({ success: true });
     } catch (err: any) {
@@ -1206,7 +1206,7 @@ async function startServer() {
       const aiClient = getAI();
       const prompt = `Extract professional info from this resume text: ${resumeText}. 
       Return JSON with fields: name, email, skills (array), experience (years as number or text), topExperiences (array of strings), education.`;
-      
+
       const response = await aiClient.models.generateContent({
         model: "gemini-3.5-flash",
         contents: prompt,
@@ -1231,7 +1231,7 @@ async function startServer() {
       res.json({
         name: "Extracted Profile",
         email: "candidate@email.com",
-        skills: ["React", "CSS", "Problem Science"],
+        skills: ["React", "CSS", "Problem Solving"],
         experience: "3",
         topExperiences: ["Experienced candidate with strong background"],
         education: "B.S. Computer Engineering"
@@ -1279,7 +1279,7 @@ async function startServer() {
       console.warn(`[Port Conflict] Port ${PORT} is already in use! (Your 'node index.js' backend is likely already running on this port).`);
       const fallbackPort = PORT === 3000 ? 3001 : PORT + 1;
       console.log(`🔄 Automatically falling back to start client-serving development server on http://localhost:${fallbackPort}...`);
-      
+
       const fallbackServer = app.listen(fallbackPort, "0.0.0.0", () => {
         console.log(`🚀 Resilient frontend server running on http://localhost:${fallbackPort}`);
       });
